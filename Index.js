@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Web server sederhana agar Render tidak mematikan bot
 app.get('/', (req, res) => {
     res.send('Bot WhatsApp is Running!');
 });
@@ -10,8 +11,7 @@ app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
 
-// ... kode bot Anda yang lama dilanjutkan di bawah ini ...
-
+// --- KODE BOT ANDA ---
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 
@@ -24,21 +24,30 @@ async function connectToWhatsApp() {
         browser: ['Bot CS', 'Chrome', '1.0.0'],
     });
 
-    // Bagian ini akan memunculkan kode 8 digit di log
+    // Pengecekan status pairing
     if (!sock.authState.creds.registered) {
-        const phoneNumber = '6281215427766'; // <--- GANTI dengan nomor WA Anda (contoh: 628123456789)
+        const phoneNumber = '6281215427766'; 
 
         setTimeout(async () => {
-            const code = await sock.requestPairingCode(phoneNumber);
-            console.log("--------------------------------------------------");
-            console.log("MASUKKAN KODE INI DI WHATSAPP ANDA: " + code);
-            console.log("--------------------------------------------------");
+            try {
+                const code = await sock.requestPairingCode(phoneNumber);
+                console.log("--------------------------------------------------");
+                console.log("MASUKKAN KODE INI DI WHATSAPP ANDA: " + code);
+                console.log("--------------------------------------------------");
+            } catch (err) {
+                console.log("Gagal membuat pairing code, coba cek koneksi atau nomor.");
+            }
         }, 5000);
     }
 
     sock.ev.on('connection.update', (update) => {
-        const { connection } = update;
-        if (connection === 'open') {
+        const { connection, lastDisconnect } = update;
+        if (connection === 'close') {
+            const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+            if (shouldReconnect) {
+                connectToWhatsApp();
+            }
+        } else if (connection === 'open') {
             console.log('Bot berhasil terhubung ke WhatsApp!');
         }
     });
