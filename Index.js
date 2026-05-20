@@ -7,14 +7,14 @@ async function connectToWhatsApp() {
     
     const sock = makeWASocket({
         logger: pino({ level: 'silent' }),
-        printQRInTerminal: false, // Kita matikan bawaan karena sudah pakai qrcode-terminal
+        printQRInTerminal: false, // Kita matikan bawaan karena akan memakai qrcode-terminal
         auth: state,
     });
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
         
-        // Memunculkan QR Code di terminal Railway
+        // Memunculkan QR Code di terminal Railway secara manual
         if (qr) {
             qrcode.generate(qr, { small: true });
         }
