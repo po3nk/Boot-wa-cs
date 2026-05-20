@@ -1,6 +1,5 @@
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const pino = require('pino');
-const qrcode = require('qrcode'); // Gunakan library qrcode biasa
 
 async function connectToWhatsApp() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
@@ -8,23 +7,21 @@ async function connectToWhatsApp() {
     const sock = makeWASocket({
         logger: pino({ level: 'silent' }),
         auth: state,
+        browser: ['Chrome (Linux)', 'Chrome', '1.0.0'],
     });
 
-    sock.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect, qr } = update;
-        
-        // Jika QR muncul, kita buatkan link gambar
-        if (qr) {
-            const url = await qrcode.toDataURL(qr);
-            console.log("--------------------------------------------------");
-            console.log("QR CODE LINK: " + url); // Copy link ini, buka di HP, scan gambarnya!
-            console.log("--------------------------------------------------");
-        }
-        
-        if (connection === 'close') {
-            const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-            if (shouldReconnect) connectToWhatsApp();
-        } else if (connection === 'open') {
+    // Ini yang akan memunculkan kode 8 digit di log
+    if (!sock.authState.creds.registered) {
+        const phoneNumber = '6281215427766'; // Ganti dengan nomor WhatsApp Bot Anda (format internasional)
+        const code = await sock.requestPairingCode(phoneNumber);
+        console.log("--------------------------------------------------");
+        console.log("MASUKKAN KODE INI DI WHATSAPP ANDA: " + code);
+        console.log("--------------------------------------------------");
+    }
+
+    sock.ev.on('connection.update', (update) => {
+        const { connection } = update;
+        if (connection === 'open') {
             console.log('Bot berhasil terhubung ke WhatsApp!');
         }
     });
