@@ -1,13 +1,14 @@
+
 {
   "name": "boot-wa-cs",
   "version": "1.0.0",
+  "description": "Bot WhatsApp CS Pintar",
   "main": "Index.js",
   "scripts": {
     "start": "node Index.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "latest",
-    "pino": "latest",
-    "qrcode-terminal": "latest"
+    "pino": "latest"
   }
 }
