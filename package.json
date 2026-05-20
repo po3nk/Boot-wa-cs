@@ -1,8 +1,6 @@
-
 {
   "name": "boot-wa-cs",
   "version": "1.0.0",
-  "description": "Bot WhatsApp CS Pintar",
   "main": "Index.js",
   "scripts": {
     "start": "node Index.js"
@@ -12,3 +10,4 @@
     "pino": "latest"
   }
 }
+
