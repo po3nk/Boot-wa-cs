@@ -1,3 +1,17 @@
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('Bot WhatsApp is Running!');
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+
+// ... kode bot Anda yang lama dilanjutkan di bawah ini ...
+
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 
